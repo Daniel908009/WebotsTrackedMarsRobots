@@ -1,0 +1,172 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/solids/protos/SolidBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
+
+WorldInfo {
+  gravity 3.71
+  contactProperties [
+    ContactProperties {
+      material1 "MarsTrack"
+      material2 "MarsGround"
+      coulombFriction [
+        0.8
+      ]
+      bounce 0
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.10558970071901196 0.05311840214740471 -0.9929900555672128 2.5495700705304016
+  position 28.80238323958124 19.793277018343286 8.456355703232308
+  follow "Tracked Rover 1"
+}
+TexturedBackground {
+  texture "mars"
+}
+TexturedBackgroundLight {
+}
+Robot {
+  translation 0 0 0.5
+  children [
+    Emitter {
+    }
+    Receiver {
+    }
+    LED {
+      translation 0 0 0.29
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0 0
+            metalness 0
+          }
+          geometry Sphere {
+            radius 0.1
+          }
+        }
+      ]
+      name "statusLed"
+      color []
+      gradual TRUE
+    }
+    Compass {
+    }
+    GPS {
+    }
+    Track {
+      translation 0 -0.71 -0.18
+      children [
+        TrackWheel {
+          position -0.5 0
+          rotation 0.556660654548354 -0.5874207949603281 0.5874229526720712 2.1257106343506087
+          radius 0.3
+        }
+        TrackWheel {
+          position 0.5 0
+          rotation 0.556660654548354 -0.5874207949603281 0.5874229526720712 2.1257106343506087
+          radius 0.3
+        }
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0 0
+          }
+          geometry Box {
+            size 1.3 0.3 0.55
+          }
+        }
+      ]
+      name "LeftTrack"
+      contactMaterial "Default"
+      boundingObject Box {
+        size 1.3 0.3 0.55
+      }
+      physics Physics {
+      }
+      device [
+        LinearMotor {
+          name "left motor"
+          maxVelocity 0.5
+          maxForce 300
+        }
+      ]
+    }
+    Track {
+      translation 0 0.71 -0.18
+      children [
+        TrackWheel {
+          position -0.5 0
+          rotation 0.29697296081537106 -0.6752050471115417 0.6752075272830219 2.564239886753982
+          radius 0.3
+        }
+        TrackWheel {
+          position 0.5 0
+          rotation 0.29697296081537106 -0.6752050471115417 0.6752075272830219 2.564239886753982
+          radius 0.3
+        }
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0 0
+          }
+          geometry Box {
+            size 1.3 0.3 0.55
+          }
+        }
+      ]
+      name "RightTrack"
+      boundingObject Box {
+        size 1.3 0.3 0.55
+      }
+      physics Physics {
+      }
+      device [
+        LinearMotor {
+          name "right motor"
+          maxVelocity 0.5
+          maxForce 300
+        }
+      ]
+    }
+    SolidBox {
+      translation 0 0 0
+      size 1.5 1 0.5
+      appearance PBRAppearance {
+        baseColor 0.529412 0.529412 0.529412
+        baseColorMap ImageTexture {
+          url [
+            ""
+          ]
+        }
+        roughness 0.7
+        metalness 0
+      }
+    }
+  ]
+  name "Tracked Rover 1"
+  boundingObject Box {
+    size 1.5 0.75 0.5
+  }
+  physics Physics {
+  }
+  controller "mars_rover_controller"
+}
+Floor {
+  size 30 30
+  appearance PBRAppearance {
+    baseColor 1 0.666667 0
+  }
+}
+Robot {
+  translation 0 0 3.19
+  children [
+    Receiver {
+    }
+    Emitter {
+    }
+  ]
+  name "coordinator"
+  controller "coordinator_controller"
+  supervisor TRUE
+}
