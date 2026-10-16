@@ -19,8 +19,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.24780214924707952 0.01885448681436652 -0.9686271744874263 3.145895839993386
-  position 9.356092516975467 0.041720550192161955 5.131371924863466
+  orientation 0.29179563018560556 0.008545510485908124 -0.9564425149767866 3.214541434806157
+  position 43.63519089886148 -2.36791856265704 30.657382570021607
   follow "Tracked Rover 1"
 }
 TexturedBackground {
@@ -29,7 +29,7 @@ TexturedBackground {
 TexturedBackgroundLight {
 }
 Robot {
-  translation 0 0 0.5
+  translation 0 -7.92 0.5
   children [
     DistanceSensor {
       translation 0.79 -0.44 0.01
@@ -69,12 +69,31 @@ Robot {
         2 100 0
       ]
     }
+    DistanceSensor {
+      translation 0.79 0 0.01
+      rotation 0 0 0.9999999999999999 0
+      children [
+        Shape {
+          appearance PBRAppearance {
+            metalness 0.1
+          }
+          geometry Box {
+            size 0.1 0.1 0.1
+          }
+        }
+      ]
+      name "distanceSensorFront"
+      lookupTable [
+        0 0 0
+        2 100 0
+      ]
+    }
     Emitter {
     }
     Receiver {
     }
     LED {
-      translation 0 0 0.29
+      translation 0 0 0.42
       children [
         Shape {
           appearance PBRAppearance {
@@ -99,12 +118,12 @@ Robot {
       children [
         TrackWheel {
           position -0.5 0
-          rotation 0.5976920018414323 0.5669047141805463 -0.5669067965500629 2.064154459401789
+          rotation 0.9863952294516731 -0.11624188585204151 0.1162423128148352 1.5844977347555935
           radius 0.3
         }
         TrackWheel {
           position 0.5 0
-          rotation 0.5976920018414323 0.5669047141805463 -0.5669067965500629 2.064154459401789
+          rotation 0.9863952294516731 -0.11624188585204151 0.1162423128148352 1.5844977347555935
           radius 0.3
         }
         Shape {
@@ -136,12 +155,12 @@ Robot {
       children [
         TrackWheel {
           position -0.5 0
-          rotation 0.7706193085041033 0.45063532346276325 -0.45063697874039205 1.8284614161418067
+          rotation 0.04102593111872138 -0.7065101577305698 0.7065127528922371 3.0595870803830776
           radius 0.3
         }
         TrackWheel {
           position 0.5 0
-          rotation 0.7706193085041033 0.45063532346276325 -0.45063697874039205 1.8284614161418067
+          rotation 0.04102593111872138 -0.7065101577305698 0.7065127528922371 3.0595870803830776
           radius 0.3
         }
         Shape {
@@ -168,37 +187,93 @@ Robot {
       ]
     }
     SolidBox {
-      translation 0 0 0
+      translation 0 0 0.14
       size 1.5 1 0.5
       appearance PBRAppearance {
         baseColor 0.529412 0.529412 0.529412
         baseColorMap ImageTexture {
           url [
-            ""
+            "../color.png"
           ]
         }
         roughness 0.7
         metalness 0
       }
+      physics Physics {
+      }
     }
   ]
   name "Tracked Rover 1"
-  boundingObject Box {
-    size 1.5 0.75 0.5
-  }
   physics Physics {
   }
   controller "mars_rover_controller"
 }
 Robot {
-  translation 0.1 4.85 0.6
+  translation 0.1 4.66 0.6
   children [
+    DistanceSensor {
+      translation 0.79 -0.44 0.01
+      rotation 0 0 -0.9999999999999999 0.9077260355446238
+      children [
+        Shape {
+          appearance PBRAppearance {
+            metalness 0.1
+          }
+          geometry Box {
+            size 0.1 0.1 0.1
+          }
+        }
+      ]
+      name "distanceSensorRight"
+      lookupTable [
+        0 0 0
+        2 100 0
+      ]
+    }
+    DistanceSensor {
+      translation 0.79 0.44 0.01
+      rotation 0 0 0.9999999999999999 0.9077213908746088
+      children [
+        Shape {
+          appearance PBRAppearance {
+            metalness 0.1
+          }
+          geometry Box {
+            size 0.1 0.1 0.1
+          }
+        }
+      ]
+      name "distanceSensorLeft"
+      lookupTable [
+        0 0 0
+        2 100 0
+      ]
+    }
+    DistanceSensor {
+      translation 0.79 0 0.01
+      rotation 0 0 0.9999999999999999 0
+      children [
+        Shape {
+          appearance PBRAppearance {
+            metalness 0.1
+          }
+          geometry Box {
+            size 0.1 0.1 0.1
+          }
+        }
+      ]
+      name "distanceSensorFront"
+      lookupTable [
+        0 0 0
+        2 100 0
+      ]
+    }
     Emitter {
     }
     Receiver {
     }
     LED {
-      translation 0 0 0.29
+      translation 0 0 0.42
       children [
         Shape {
           appearance PBRAppearance {
@@ -223,12 +298,12 @@ Robot {
       children [
         TrackWheel {
           position -0.5 0
-          rotation 0.10542806675322274 0.70316473545018 -0.7031673183247046 2.9315133444283488
+          rotation 0.8316714289647676 -0.3926330995500719 0.3926345417578602 1.7540829088745415
           radius 0.3
         }
         TrackWheel {
           position 0.5 0
-          rotation 0.10542806675322274 0.70316473545018 -0.7031673183247046 2.9315133444283488
+          rotation 0.8316714289647676 -0.3926330995500719 0.3926345417578602 1.7540829088745415
           radius 0.3
         }
         Shape {
@@ -260,12 +335,12 @@ Robot {
       children [
         TrackWheel {
           position -0.5 0
-          rotation 0.03555774508035666 -0.7066583255726319 0.7066609212795656 3.0705073732921084
+          rotation 0.7282568652826271 -0.48458240428308647 0.48458418425279287 1.8827168203607603
           radius 0.3
         }
         TrackWheel {
           position 0.5 0
-          rotation 0.03555774508035666 -0.7066583255726319 0.7066609212795656 3.0705073732921084
+          rotation 0.7282568652826271 -0.48458240428308647 0.48458418425279287 1.8827168203607603
           radius 0.3
         }
         Shape {
@@ -292,24 +367,23 @@ Robot {
       ]
     }
     SolidBox {
-      translation 0 0 0
+      translation 0 0 0.14
       size 1.5 1 0.5
       appearance PBRAppearance {
         baseColor 0.529412 0.529412 0.529412
         baseColorMap ImageTexture {
           url [
-            ""
+            "../color.png"
           ]
         }
         roughness 0.7
         metalness 0
       }
+      physics Physics {
+      }
     }
   ]
   name "Tracked Rover 2"
-  boundingObject Box {
-    size 1.5 0.75 0.5
-  }
   physics Physics {
   }
   controller "mars_rover_controller"
@@ -331,4 +405,26 @@ Robot {
   name "coordinator"
   controller "coordinator_controller"
   supervisor TRUE
+}
+DEF TemplateRock Solid {
+  translation 6 0 0
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "../rock.jpg"
+          ]
+        }
+        metalness 0
+      }
+      geometry Sphere {
+        radius 0.1
+      }
+    }
+  ]
+  name "Rock_-4.097288244659934_-1.8365216956021602"
+  boundingObject Sphere {
+    radius 0.1
+  }
 }

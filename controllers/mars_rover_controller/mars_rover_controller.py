@@ -4,8 +4,10 @@ import math
 robot = Robot()
 keyboard = Keyboard()
 
+
 timestep=int(robot.getBasicTimeStep())
 keyboard.enable(timestep)
+
 
 left_motor = robot.getDevice("left motor")
 right_motor = robot.getDevice("right motor")
@@ -19,11 +21,13 @@ emitter = robot.getDevice("emitter")
 # collision stuff
 distanceSensorLeft = robot.getDevice("distanceSensorLeft")
 distanceSensorRight = robot.getDevice("distanceSensorRight")
-if distanceSensorLeft is None or distanceSensorRight is None:
+distanceSensorFront = robot.getDevice("distanceSensorFront")
+if distanceSensorLeft is None or distanceSensorRight is None or distanceSensorFront is None:
     pass
 else:
     distanceSensorLeft.enable(timestep)
     distanceSensorRight.enable(timestep)
+    distanceSensorFront.enable(timestep)
 
 
 gps.enable(timestep)
@@ -34,9 +38,8 @@ left_motor.setPosition(float("inf"))
 right_motor.setPosition(float("inf"))
 
 speed = 0.5
-wait_time = 3.0
 DistanceThreshold = 0.8
-targets = [(5,5)]
+targets = []
 
 manualDriving = False
 collisionStop = False
@@ -77,22 +80,23 @@ def setMotorSpeeds():
 
 def HandleCollisionSafety():
     global collisionStop, avoidingObstacle, currentAvoidingTime
-    if distanceSensorLeft is None or distanceSensorRight is None: return
+    if distanceSensorLeft is None or distanceSensorRight is None or distanceSensorFront is None: return
     left_distance = distanceSensorLeft.getValue()
     right_distance = distanceSensorRight.getValue()
-    #print(f"Left distance: {left_distance}, Right distance: {right_distance}")
-    if left_distance < 5 or right_distance < 5:
-        print("Collision detected! Stopping the rover.")
+    front_distance = distanceSensorFront.getValue()
+    #print(f"Left distance: {left_distance}, Right distance: {right_distance}, Front distance: {front_distance}")
+    if left_distance < 5 or right_distance < 5 or front_distance < 5:
+        #print("Collision detected! Stopping the rover.")
         collisionStop = True
         stop()
         ReturnTargets()
-    elif left_distance < right_distance:
-        print("Obstacle detected on the left")
+    elif left_distance < right_distance or front_distance < 80:
+        #print("Obstacle detected on the left")
         turnRight(speed/2)
         avoidingObstacle = True
         currentAvoidingTime = 0
     elif right_distance < left_distance:
-        print("Obstacle detected on the right")
+        #print("Obstacle detected on the right")
         turnLeft(speed/2)
         avoidingObstacle = True
         currentAvoidingTime = 0
@@ -130,7 +134,7 @@ while robot.step(timestep) != -1:
         ReturnTargets()
     elif key == "T":
         manualDriving = False
-        emitter.send(f"complete,{robot.getName()}".encode('utf-8'))
+        emitter.send(f"available,{robot.getName()}".encode('utf-8'))
     if manualDriving:
         status_led.set(0x0000FF)
         stop()
@@ -165,20 +169,26 @@ while robot.step(timestep) != -1:
         distance = math.sqrt(dx**2 + dy**2)
         #print("distance to target: " + str(distance))
         if distance < DistanceThreshold:
-            targets.pop(0)
-            print("Rover " + robot.getName() + " Target reached! Remaining targets: " + str(len(targets)))
-            emitter.send(f"complete,{robot.getName()}".encode('utf-8'))
+            target = targets[0]
             stop()
-            if len(targets) == 0:
-                print("Rover " + robot.getName() + " Tasks completed!")
             setMotorSpeeds()
-            for _ in range(int(wait_time * 1000 / timestep)):
+
+            wait_time = 3.0
+            while robot.step(timestep) != -1:
                 #print("Waiting for " + str(wait_time) + " seconds...")
+                wait_time -= timestep / 1000.0
+                if wait_time <= 0:
+                    break
                 status_led.set(0x00FFFF)
                 robot.step(timestep)
+            emitter.send(f"complete,{robot.getName()},{target[0]},{target[1]}".encode('utf-8'))
+            targets.pop(0)
+            print("Rover " + robot.getName() + " Target reached! Remaining targets: " + str(len(targets)))
+            #if len(targets) == 0:
+                #print("Rover " + robot.getName() + " Tasks completed!")
         HandleCollisionSafety()
     elif avoidingObstacle:
-        print("Avoiding obstacle...")
+        #print("Avoiding obstacle...")
         status_led.set(0xFFFF00)
         forward(speed/2)
         HandleCollisionSafety()
