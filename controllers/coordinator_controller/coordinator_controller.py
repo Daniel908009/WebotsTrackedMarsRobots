@@ -6,14 +6,57 @@ coordinator = Supervisor()
 timestep = int(coordinator.getBasicTimeStep())
 next_target_time = 0
 target_interval = 15.0
-unassigned_targets = [(6,0)] # template rock spawn position 
+unassigned_targets = [(6,0), (6,0), (6,0), (6,0)] # template rock spawn position 
 registered_rovers = {}
+stopped_rovers = []
 maximumTargetsPerRover = 3
 rocks = {}
 emitter = coordinator.getDevice("emitter")
 receiver = coordinator.getDevice("receiver")
 receiver.enable(timestep)
 rockNumber = 0
+safetyDistance = 8
+
+def UpdateStoppedList():
+    for i in range(len(registered_rovers) - 1, -1, -1):
+        for j in range(len(registered_rovers) - 1, -1, -1):
+            if i != j:
+                rover_i = list(registered_rovers.keys())[i]
+                rover_j = list(registered_rovers.keys())[j]
+                position_i = registered_rovers[rover_i]["position"]
+                position_j = registered_rovers[rover_j]["position"]
+                distance = ((position_i[0] - position_j[0]) ** 2 + (position_i[1] - position_j[1]) ** 2) ** 0.5
+                #print(f"Distance between {rover_i} and {rover_j}: {distance}")
+                if distance < safetyDistance and stopped_rovers.count({"roverStopped": rover_i, "roverWithPriority": rover_j}) == 0 and stopped_rovers.count({"roverStopped": rover_j, "roverWithPriority": rover_i}) == 0:
+                    print(f"Rover {rover_i} and Rover {rover_j} are too close! Distance: {distance}. Determining which rover has priority.")
+                    if len(registered_rovers[rover_i]["targets"]) > len(registered_rovers[rover_j]["targets"]):
+                        stopped_rovers.append({"roverStopped": rover_j, "roverWithPriority": rover_i})
+                        message = f"stop,{rover_j}".encode('utf-8')
+                        emitter.send(message)
+                    elif len(registered_rovers[rover_i]["targets"]) < len(registered_rovers[rover_j]["targets"]):
+                        stopped_rovers.append({"roverStopped": rover_i, "roverWithPriority": rover_j})
+                        message = f"stop,{rover_i}".encode('utf-8')
+                        emitter.send(message)
+                    else:
+                        if i < j:
+                            stopped_rovers.append({"roverStopped": rover_i, "roverWithPriority": rover_j})
+                            message = f"stop,{rover_i}".encode('utf-8')
+                            emitter.send(message)
+                        else:
+                            stopped_rovers.append({"roverStopped": rover_j, "roverWithPriority": rover_i})
+                            message = f"stop,{rover_j}".encode('utf-8')
+                            emitter.send(message)
+                elif stopped_rovers.count({"roverStopped": rover_i, "roverWithPriority": rover_j}) > 0 or stopped_rovers.count({"roverStopped": rover_j, "roverWithPriority": rover_i}) > 0:
+                    if distance >= safetyDistance:
+                        print(f"Removing from stopped_rovers: {rover_i} and {rover_j} as distance is now {distance}")
+                        if stopped_rovers.count({"roverStopped": rover_i, "roverWithPriority": rover_j}) > 0:
+                            stopped_rovers.remove({"roverStopped": rover_i, "roverWithPriority": rover_j})
+                            message = f"resume,{rover_i}".encode('utf-8')
+                            emitter.send(message)
+                        if stopped_rovers.count({"roverStopped": rover_j, "roverWithPriority": rover_i}) > 0:
+                            stopped_rovers.remove({"roverStopped": rover_j, "roverWithPriority": rover_i})
+                            message = f"resume,{rover_j}".encode('utf-8')
+                            emitter.send(message)
 
 def ClosestRoverPath(rovers, target):
     closest_rover = None
@@ -97,3 +140,5 @@ while coordinator.step(timestep) != -1:
             emitter.send(message)
             print("popping unassigned target: " + str(unassigned_targets[0]))
             unassigned_targets.pop(0)
+    if frameCount > 1:
+        UpdateStoppedList()

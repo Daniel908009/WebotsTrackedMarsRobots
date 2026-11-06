@@ -43,8 +43,9 @@ targets = []
 
 manualDriving = False
 collisionStop = False
+regularStop = False
 avoidingObstacle = False
-avoidingObstacleTime = 3
+avoidingObstacleTime = 5
 currentAvoidingTime = 0
 
 leftSpeed = 0.0
@@ -114,7 +115,7 @@ while robot.step(timestep) != -1:
         status_led.set(0x00FF00)
     else:
         status_led.set(0xFFA500)
-    if receiver.getQueueLength() > 0:
+    while receiver.getQueueLength() > 0:
         message = receiver.getString()
         task, name = tuple(map(str, message.split(',')[0:2]))
         if name == robot.getName():
@@ -123,6 +124,13 @@ while robot.step(timestep) != -1:
                 target = (float(x), float(y))
                 targets.append(target)
                 print("Rover " + robot.getName() + " Target received: " + str(targets))
+            elif task == "stop":
+                regularStop = True
+                stop()
+                print("Rover " + robot.getName() + " Stop command received!")
+            elif task == "resume":
+                regularStop = False
+                print("Rover " + robot.getName() + " Resume command received!")
         receiver.nextPacket()
     #print(key)
     #print("Targets: " + str(targets))
@@ -148,7 +156,7 @@ while robot.step(timestep) != -1:
             #print("here")
         elif key == "D":
             turnRight(speed)
-    elif len(targets) > 0 and not collisionStop and not avoidingObstacle:
+    elif len(targets) > 0 and not collisionStop and not avoidingObstacle and not regularStop:
         status_led.set(0xFF0000)
         position = gps.getValues()
         dx = targets[0][0] - position[0]
